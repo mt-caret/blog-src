@@ -7,8 +7,8 @@ It's been a while. People have suggested that I blog again, so here I am. Mostly
 it's been a lack of time, but getting my static site generator working again was
 too painful for me to muster the energy to write anything. Let's fix that first.
 
-[Dune], the build system often used for OCaml projects, is pretty general,
-and you can use it as a Makefile-on-steroids.
+[Dune](https://dune.build/), the build system often used for OCaml projects, is
+pretty general, and you can use it as a Makefile-on-steroids.
 
 Here's a simple dune rule for building a markdown file into an html file:
 
@@ -93,3 +93,19 @@ let () =
   |}]
 ;;
 ```
+
+We also want to generate an index page, so we'll add an rule for that:
+
+```
+(rule
+ (deps ./index.sh (source_tree .))
+ (action
+  (with-stdout-to
+   index.html
+   (run ./index.sh))))
+```
+
+<!--
+You can see the full source for this site [on
+GitHub](https://github.com/mt-caret/blog-src).
+-->

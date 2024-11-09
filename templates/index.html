@@ -30,11 +30,6 @@
 </head>
 
 <body>
-  <div id="navigation-bar">
-    <div id="navigation-content">
-      <a href="./index.html">index</a>
-    </div>
-  </div>
   <article>
     $for(include-before)$
     $include-before$
@@ -64,7 +59,7 @@
     <ul>
       $for(posts)$
       $if(posts.date)$
-      <li><a href="$posts.href$">$posts.date$ - $posts.title$</a></li>
+      <li><a href="$posts.href$">$posts.date$: $posts.title$</a></li>
       $else$
       <li><a href="$posts.href$">$posts.title$</a></li>
       $endif$
