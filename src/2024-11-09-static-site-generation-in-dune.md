@@ -105,7 +105,4 @@ We also want to generate an index page, so we'll add an rule for that:
    (run ./index.sh))))
 ```
 
-<!--
-You can see the full source for this site [on
-GitHub](https://github.com/mt-caret/blog-src).
--->
+You can see the full source for this site [on GitHub](https://github.com/mt-caret/blog-src).
