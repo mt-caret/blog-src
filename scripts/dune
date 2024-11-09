@@ -1,0 +1,6 @@
+(rule
+ (deps
+  (glob_files *.sh))
+ (alias runtest)
+ (action
+  (run shellcheck %{deps})))
