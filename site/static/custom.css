@@ -1,0 +1,41 @@
+/* based on http://bettermotherfuckingwebsite.com/ */
+
+body {
+  margin: 40px auto;
+  max-width: 650px;
+  line-height: 1.6;
+  font-size: 18px;
+  color: #444;
+  padding: 0 10px
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.2
+}
+
+/* https://stackoverflow.com/a/28824157 */
+:target::before {
+  content: "";
+  display: block;
+  height: 40px;
+  margin: -40px 0 0;
+}
+
+pre {
+  background: #EAEAEA;
+  border-radius: 5px;
+  overflow: auto;
+  line-height: 1.4;
+  font-size: 80%;
+}
+
+code {
+  background: #EAEAEA;
+  border-radius: 5px;
+}
+
+pre>code {
+  white-space: pre;
+}

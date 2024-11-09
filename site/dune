@@ -10,5 +10,7 @@
 
 (rule
  (alias default)
+ (deps
+  (source_tree ./static))
  (action
   (diff dune.inc dune.inc.gen)))

@@ -1,0 +1,6 @@
+(rule
+ (deps ../../scripts/highlighting-css.sh)
+ (action
+  (with-stdout-to
+   highlighting.css
+   (run ../../scripts/highlighting-css.sh))))

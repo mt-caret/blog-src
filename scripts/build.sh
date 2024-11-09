@@ -7,4 +7,5 @@ output_file=$2
 
 pandoc "$input_file" \
  --output "$output_file" \
- --embed-resources --standalone --to=html5
+ --template ../templates/post.html \
+ --to=html5

@@ -5,7 +5,7 @@ let generate_pragma slug =
     [%string
       {|
 (rule
- (deps ../scripts/build.sh ../src/%{slug}.md)
+ (deps ../scripts/build.sh ../templates/post.html ../src/%{slug}.md)
  (targets %{slug}.html)
  (action
   (run ../scripts/build.sh ../src/%{slug}.md %{slug}.html)))|}]
