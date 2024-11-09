@@ -4,7 +4,7 @@ body {
   margin: 40px auto;
   max-width: 650px;
   line-height: 1.6;
-  font-size: 18px;
+  font-size: 14px;
   color: #444;
   padding: 0 10px
 }
@@ -15,14 +15,6 @@ h3 {
   line-height: 1.2
 }
 
-/* https://stackoverflow.com/a/28824157 */
-:target::before {
-  content: "";
-  display: block;
-  height: 40px;
-  margin: -40px 0 0;
-}
-
 pre {
   background: #EAEAEA;
   border-radius: 5px;
@@ -31,11 +23,7 @@ pre {
   font-size: 80%;
 }
 
-code {
+.sourceCode {
   background: #EAEAEA;
   border-radius: 5px;
-}
-
-pre>code {
-  white-space: pre;
 }
