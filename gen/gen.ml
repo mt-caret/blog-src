@@ -1,6 +1,7 @@
 open! Core
 
 let generate_pragma slug =
+  let git_revision_variable = "%{read-lines:git-revision}" in
   print_endline
     [%string
       {|
@@ -8,7 +9,7 @@ let generate_pragma slug =
  (deps ../scripts/build.sh ../templates/post.html ../src/%{slug}.md git-revision)
  (targets %{slug}.html)
  (action
-  (run ../scripts/build.sh ../src/%{slug}.md %{slug}.html git-revision)))|}]
+  (run ../scripts/build.sh ../src/%{slug}.md %{slug}.html "%{git_revision_variable}")))|}]
 ;;
 
 let () =

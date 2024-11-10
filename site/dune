@@ -16,7 +16,7 @@
  (action
   (with-stdout-to
    index.html
-   (run ../scripts/index.sh))))
+   (run ../scripts/index.sh "%{read-lines:git-revision}"))))
 
 (rule
  (deps
@@ -25,6 +25,32 @@
   (with-stdout-to
    dune.inc.gen
    (run ../gen/gen.exe))))
+
+(rule
+ (deps ../site_config.json git-revision)
+ (action
+  (with-stdout-to
+   site_config.json
+   (run
+    sed
+    -e
+    "s/GIT_REVISION/%{read-lines:git-revision}/"
+    ../site_config.json))))
+
+(rule
+ (targets rss.xml atom.xml)
+ (deps
+  ../tools/bin/tools.exe
+  (source_tree ../src)
+  site_config.json)
+ (action
+  (run
+   ../tools/bin/tools.exe
+   syndication-feeds
+   ../src
+   ./
+   -site-config
+   site_config.json)))
 
 (rule
  (alias default)

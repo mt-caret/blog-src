@@ -5,6 +5,7 @@ category: tech
 tags:
 - NixOS
 - Nix
+uuid: 851f141b-f08b-4f40-b849-ed32070a3053
 ---
 
 At work, we manage an OpenLDAP server that handles authentication and

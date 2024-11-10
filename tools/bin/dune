@@ -1,0 +1,3 @@
+(executable
+ (name tools)
+ (libraries core core_unix.command_unix tools_lib))

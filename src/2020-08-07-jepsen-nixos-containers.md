@@ -6,6 +6,7 @@ tags:
 - NixOS
 - Nix
 - Jepsen
+uuid: 9f24020a-27b7-4429-bccb-4a3aa4ab1748
 ---
 
 [Jepsen](https://github.com/jepsen-io/jepsen) is a distributed system testing

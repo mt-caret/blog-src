@@ -5,6 +5,7 @@ category: tech
 tags:
 - NixOS
 - Nix
+uuid: 11599fd3-2782-4262-8ab3-c2e1f0ee1e8a
 ---
 
 A few years after starting to use NixOS, I realized that the experience

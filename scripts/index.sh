@@ -25,8 +25,9 @@ entries=$(
 )
 
 title="blog"
+rev=$1
 echo -e "---\ntitle: $title\nposts:\n$entries\n---" |
 pandoc \
  --template ../templates/index.html \
- --variable rev:"$(cat git-revision)" \
+ --variable rev:"$rev" \
  --to=html5

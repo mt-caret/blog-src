@@ -1,6 +1,7 @@
 ---
 title: Static site generation in dune
 date: 2024-11-09
+uuid: 1b57d296-19d1-4552-a823-f7b3b32f766d
 ---
 
 It's been a while. People have suggested that I blog again, so here I am. Mostly

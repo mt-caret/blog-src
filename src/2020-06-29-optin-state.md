@@ -5,6 +5,7 @@ category: tech
 tags:
 - NixOS
 - Nix
+uuid: 1defcab1-93ee-4bf6-9511-0e744e8d1a93
 ---
 
 [grahamc's "Erase your darlings" blog post](https://grahamc.com/blog/erase-your-darlings)
