@@ -101,7 +101,7 @@ let create_rss_feed
     ~generator:(Site_config.generator config)
     ~title
     ~link:base_url
-    ~url:base_url
+    ~url:(base_url ^ "/rss.xml")
     ~description
     Post.to_rss_item
     posts
@@ -120,7 +120,7 @@ let create_atom_feed
     |> Option.value ~default:Date.unix_epoch
   in
   Atom.feed
-    ~links:[ Atom.self base_url ]
+    ~links:[ Atom.self (base_url ^ "/atom.xml") ]
     ~generator:(Some (Site_config.generator config))
     ~updated:(Atom.updated_given (yocaml_datetime_of_date most_recent_update_date))
     ~title:(Atom.text title)
@@ -179,7 +179,7 @@ let%test_module _ =
             <title>Test</title>
             <link>https://test.com</link>
             <description><![CDATA[Test]]></description>
-            <atom:link href="https://test.com" rel="self" type="application/rss+xml"/>
+            <atom:link href="https://test.com/rss.xml" rel="self" type="application/rss+xml"/>
             <docs>https://www.rssboard.org/rss-specification</docs>
             <generator>blog-src</generator>
             <item>
@@ -206,7 +206,7 @@ let%test_module _ =
           <author>
             <name>author</name>
           </author>
-          <link href="https://test.com" rel="self"/>
+          <link href="https://test.com/atom.xml" rel="self"/>
           <entry>
             <id>tag:test.com,1970-01-01:70623b46-7672-4ea7-9c2a-4ff6ddfd6cda</id>
             <title type="text">Test post</title>
