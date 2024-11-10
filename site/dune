@@ -1,10 +1,18 @@
 (include dune.inc)
 
 (rule
+ (deps (universe))
+ (action
+  (with-stdout-to
+   git-revision
+   (run git log -1 --format=%h))))
+
+(rule
  (deps
   ../scripts/index.sh
   (source_tree ../src)
-  ../templates/index.html)
+  ../templates/index.html
+  git-revision)
  (action
   (with-stdout-to
    index.html

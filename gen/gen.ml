@@ -5,10 +5,10 @@ let generate_pragma slug =
     [%string
       {|
 (rule
- (deps ../scripts/build.sh ../templates/post.html ../src/%{slug}.md)
+ (deps ../scripts/build.sh ../templates/post.html ../src/%{slug}.md git-revision)
  (targets %{slug}.html)
  (action
-  (run ../scripts/build.sh ../src/%{slug}.md %{slug}.html)))|}]
+  (run ../scripts/build.sh ../src/%{slug}.md %{slug}.html git-revision)))|}]
 ;;
 
 let () =

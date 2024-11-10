@@ -28,4 +28,5 @@ title="blog"
 echo -e "---\ntitle: $title\nposts:\n$entries\n---" |
 pandoc \
  --template ../templates/index.html \
+ --variable rev:"$(cat git-revision)" \
  --to=html5
