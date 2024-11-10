@@ -1,8 +1,8 @@
 {
   "title": "mt_caret's blog",
   "base_url": "https://mt-caret.github.io/blog",
+  "domain_name": "mt-caret.github.io",
   "description": "mt_caret's blog",
   "author": "mt_caret",
-  "uuid": "47bac696-cd23-4e1f-8171-aef5f1f292e9",
   "site_generator_version": "GIT_REVISION"
 }

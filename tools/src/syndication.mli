@@ -4,9 +4,9 @@ module Site_config : sig
   type t =
     { title : string
     ; base_url : string
+    ; domain_name : string
     ; description : string
     ; author : string
-    ; uuid : string
     ; site_generator_version : string
     }
   [@@deriving yojson]

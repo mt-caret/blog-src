@@ -7,9 +7,9 @@ module Site_config = struct
   type t =
     { title : string
     ; base_url : string
+    ; domain_name : string
     ; description : string
     ; author : string
-    ; uuid : string
     ; site_generator_version : string
     }
   [@@deriving yojson]
@@ -68,21 +68,32 @@ module Post = struct
       ()
   ;;
 
-  let to_atom_entry { title; creation_date; update_date; url; content_html; uuid } =
+  let to_atom_entry
+    { title; creation_date; update_date; url; content_html; uuid }
+    ~domain_name
+    =
+    (* We use a tag URI for the id, as recommended by
+       http://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id *)
+    let id = [%string {|tag:%{domain_name},%{creation_date#Date}:%{uuid}|}] in
     Atom.entry
       ~published:(yocaml_datetime_of_date creation_date)
-      ~links:[ Atom.self url ]
+      ~links:[ Atom.alternate url ]
       ~content:(Atom.content_html content_html)
       ~title:(Atom.text title)
-      ~id:uuid
+      ~id
       ~updated:(yocaml_datetime_of_date update_date)
       ()
   ;;
 end
 
 let create_rss_feed
-  ({ title; base_url; description; author = _; uuid = _; site_generator_version = _ } as
-   config :
+  ({ title
+   ; base_url
+   ; domain_name = _
+   ; description
+   ; author = _
+   ; site_generator_version = _
+   } as config :
     Site_config.t)
   posts
   =
@@ -98,8 +109,8 @@ let create_rss_feed
 ;;
 
 let create_atom_feed
-  ({ title; base_url = _; description = _; author; uuid; site_generator_version = _ } as
-   config :
+  ({ title; base_url; domain_name; description = _; author; site_generator_version = _ }
+   as config :
     Site_config.t)
   posts
   =
@@ -109,12 +120,13 @@ let create_atom_feed
     |> Option.value ~default:Date.unix_epoch
   in
   Atom.feed
+    ~links:[ Atom.self base_url ]
     ~generator:(Some (Site_config.generator config))
     ~updated:(Atom.updated_given (yocaml_datetime_of_date most_recent_update_date))
     ~title:(Atom.text title)
     ~authors:[ Person.make author ]
-    ~id:uuid
-    Post.to_atom_entry
+    ~id:base_url
+    (Post.to_atom_entry ~domain_name)
     posts
   |> Xml.to_string
 ;;
@@ -124,9 +136,9 @@ let%test_module _ =
     let config : Site_config.t =
       { title = "Test"
       ; base_url = "https://test.com"
+      ; domain_name = "test.com"
       ; description = "Test"
       ; author = "author"
-      ; uuid = "test"
       ; site_generator_version = "1.0.0"
       }
     ;;
@@ -137,7 +149,7 @@ let%test_module _ =
         ; update_date = Date.unix_epoch
         ; url = "https://test.com/test-post"
         ; content_html = "<article>Test post</article>"
-        ; uuid = "test-post"
+        ; uuid = "70623b46-7672-4ea7-9c2a-4ff6ddfd6cda"
         }
       ]
     ;;
@@ -149,9 +161,9 @@ let%test_module _ =
         {
           "title": "Test",
           "base_url": "https://test.com",
+          "domain_name": "test.com",
           "description": "Test",
           "author": "author",
-          "uuid": "test",
           "site_generator_version": "1.0.0"
         }
         |}]
@@ -187,20 +199,21 @@ let%test_module _ =
         {|
         <?xml version="1.0" encoding="utf-8"?>
         <feed xmlns="http://www.w3.org/2005/Atom">
-          <id>test</id>
+          <id>https://test.com</id>
           <title type="text">Test</title>
           <generator uri="https://github.com/mt-caret/blog-src" version="1.0.0">blog-src</generator>
           <updated>1970-01-01T00:00:00Z</updated>
           <author>
             <name>author</name>
           </author>
+          <link href="https://test.com" rel="self"/>
           <entry>
-            <id>test-post</id>
+            <id>tag:test.com,1970-01-01:70623b46-7672-4ea7-9c2a-4ff6ddfd6cda</id>
             <title type="text">Test post</title>
             <updated>1970-01-01T00:00:00Z</updated>
             <published>1970-01-01T00:00:00Z</published>
             <content type="html">&lt;article&gt;Test post&lt;/article&gt;</content>
-            <link href="https://test.com/test-post" rel="self"/>
+            <link href="https://test.com/test-post" rel="alternate"/>
           </entry>
         </feed>
         |}]
