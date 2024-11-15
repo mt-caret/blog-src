@@ -11,7 +11,7 @@
  (deps
   ../scripts/index.sh
   (source_tree ../src)
-  ../templates/index.html
+  (glob_files ../templates/*.html)
   git-revision)
  (action
   (with-stdout-to

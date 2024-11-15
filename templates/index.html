@@ -27,15 +27,7 @@
   $for(header-includes)$
   $header-includes$
   $endfor$
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z1X55TYTWF"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-
-    gtag('config', 'G-Z1X55TYTWF');
-  </script>
+  ${ga.html()}
 </head>
 
 <body>
@@ -56,14 +48,6 @@
       <p class="date">$date$</p>
       $endif$
     </header>
-    $endif$
-    $if(toc)$
-    <nav id="$idprefix$TOC" role="doc-toc">
-      $if(toc-title)$
-      <h2 id="$idprefix$toc-title">$toc-title$</h2>
-      $endif$
-      $table-of-contents$
-    </nav>
     $endif$
     <ul>
       $for(posts)$

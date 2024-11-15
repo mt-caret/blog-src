@@ -28,15 +28,7 @@
   $for(header-includes)$
   $header-includes$
   $endfor$
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z1X55TYTWF"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-
-    gtag('config', 'G-Z1X55TYTWF');
-  </script>
+  ${ga.html()}
 </head>
 
 <body>
@@ -84,24 +76,6 @@
     </nav>
     $endif$
     $body$
-    $if(links.links)$
-    <hr>
-    <h3>links</h3>
-    <ul>
-      $for(links.links)$
-      <li><a href="./$links.links.slug$.html">$links.links.title$</a></li>
-      $endfor$
-    </ul>
-    $endif$
-    $if(links.backlinks)$
-    <hr>
-    <h3>backlinks</h3>
-    <ul>
-      $for(links.backlinks)$
-      <li><a href="./$links.backlinks.slug$.html">$links.backlinks.title$</a></li>
-      $endfor$
-    </ul>
-    $endif$
     $for(include-after)$
     $include-after$
     $endfor$
