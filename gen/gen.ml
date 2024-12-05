@@ -1,20 +1,20 @@
 open! Core
 
 let generate_pragma slug =
-  let git_revision_variable = "%{read-lines:git-revision}" in
+  let git_revision_variable = "%{read-lines:../git-revision}" in
   print_endline
     [%string
       {|
 (rule
- (deps ../scripts/build.sh (glob_files ../templates/*.html) ../src/%{slug}.md git-revision)
+ (deps ../../scripts/build.sh (glob_files ../../templates/*.html) ../../src/%{slug}.md ../git-revision)
  (targets %{slug}.html)
  (action
-  (run ../scripts/build.sh ../src/%{slug}.md %{slug}.html "%{git_revision_variable}")))|}]
+  (run ../../scripts/build.sh ../../src/%{slug}.md %{slug}.html "%{git_revision_variable}")))|}]
 ;;
 
 let () =
   let source_files =
-    Sys_unix.ls_dir "../src"
+    Sys_unix.ls_dir "../../src"
     |> List.sort ~compare:String.compare
     |> List.filter_map ~f:(fun file -> String.chop_suffix file ~suffix:".md")
   in

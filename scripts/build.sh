@@ -8,6 +8,6 @@ rev=$3
 
 pandoc "$input_file" \
  --output "$output_file" \
- --template ../templates/post.html \
+ --template ../../templates/post.html \
  --variable rev:"$rev" \
  --to=html5

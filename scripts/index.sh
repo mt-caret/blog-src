@@ -19,7 +19,7 @@ entries=$(
     sort -r |
     while read -r file; do 
         slug=$(basename -s .md "$file")
-        entry=$(metadata "$file" | jq --compact-output '{date, title, href: "./'"$slug"'.html"}')
+        entry=$(metadata "$file" | jq --compact-output '{date, title, href: "./posts/'"$slug"'.html"}')
         echo "- $entry"
     done
 )
