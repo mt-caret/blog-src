@@ -267,7 +267,7 @@ mounted early enough in the boot process. To do this, we need to add
     };
 ```
 
-Although it's possible to customize `/etc/nixos/configuration.nix` at this
+Although it's possible to customize `/mnt/etc/nixos/configuration.nix` at this
 point to set up all the things you need in one fell swoop, I recommend starting
 out with a reletively minimal config to make sure everything works ok.
 I went with something like this, with a user called `delta`:
