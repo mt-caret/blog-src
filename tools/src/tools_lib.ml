@@ -98,11 +98,12 @@ let build_post =
     |> eval
 ;;
 
+(* TODO: It's confusing that there's Metadata.t and Post_metadata.t; fix this. *)
 module Post_metadata = struct
   open Ppx_yojson_conv_lib.Yojson_conv
 
   type t =
-    { date : string
+    { date : Yojson_date.t
     ; title : string
     ; href : string
     }
@@ -132,7 +133,7 @@ let build_index =
          let slug = String.chop_suffix_exn ~suffix:".md" file in
          get_metadata (Filename.concat input_dir file)
          |> Shexp_process.map ~f:(fun metadata ->
-           { Post_metadata.date = Date.to_string metadata.date
+           { Post_metadata.date = metadata.date
            ; title = metadata.title
            ; href = "./posts/" ^ slug ^ ".html"
            }))

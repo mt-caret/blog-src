@@ -1,15 +1,9 @@
 open! Core
 open Ppx_yojson_conv_lib.Yojson_conv
 
-module Date = struct
-  type t = Date.t [@@deriving sexp_of]
-
-  let t_of_yojson json = string_of_yojson json |> Date.of_string
-end
-
 type t =
-  { date : Date.t
-  ; update_date : Date.t option [@default None]
+  { date : Yojson_date.t
+  ; update_date : Yojson_date.t option [@default None]
   ; title : string
   ; category : string [@default "uncategorized"]
   ; tags : string list [@default []]
