@@ -60,10 +60,10 @@ let generate_posts_for_syndication
 let syndication_feeds =
   Command.basic ~summary:"Generate syndication feeds"
   @@
-  let%map_open.Command input_dir = anon ("INPUT_DIR" %: string)
-  and output_dir = anon ("OUTPUT_DIR" %: string)
+  let%map_open.Command input_dir = anon ("INPUT_DIR" %: Filename_unix.arg_type)
+  and output_dir = anon ("OUTPUT_DIR" %: Filename_unix.arg_type)
   and site_config =
-    flag "site-config" (required string) ~doc:"Path to site config file"
+    flag "site-config" (required Filename_unix.arg_type) ~doc:"Path to site config file"
   in
   fun () ->
     let open Shexp_process in
@@ -73,33 +73,52 @@ let syndication_feeds =
     |> eval
 ;;
 
-let generate_pragma slug =
-  let git_revision_variable = "%{read-lines:../git-revision}" in
-  print_endline
-    [%string
-      {|
-(rule
- (deps ../../scripts/build.sh (glob_files ../../templates/*.html) ../../src/%{slug}.md ../git-revision)
+let post_generation_rule slug ~build_script_path ~templates_dir ~git_revision_file =
+  let git_revision_variable = "%{read-lines:" ^ git_revision_file ^ "}" in
+  [%string
+    {|(rule
+ (deps %{build_script_path} (glob_files %{templates_dir}/*.html) ../../src/%{slug}.md %{git_revision_file})
  (targets %{slug}.html)
  (action
-  (run ../../scripts/build.sh ../../src/%{slug}.md %{slug}.html "%{git_revision_variable}")))|}]
+  (run %{build_script_path} ../../src/%{slug}.md %{slug}.html "%{git_revision_variable}")))|}]
 ;;
 
 let print_dune_rules =
   Command.basic ~summary:"Print out dune rules"
   @@
-  let%map_open.Command input_dir = anon ("INPUT_DIR" %: string) in
+  let%map_open.Command input_dir = anon ("INPUT_DIR" %: Filename_unix.arg_type)
+  and build_script_path =
+    flag "build-script" (required Filename_unix.arg_type) ~doc:"Path to build script"
+  and templates_dir =
+    flag
+      "templates-dir"
+      (required Filename_unix.arg_type)
+      ~doc:"Path to templates directory"
+  and git_revision_file =
+    flag
+      "git-revision-file"
+      (required Filename_unix.arg_type)
+      ~doc:"Path to git revision file"
+  in
   fun () ->
     let source_files =
       Sys_unix.ls_dir input_dir
       |> List.sort ~compare:String.compare
       |> List.filter_map ~f:(fun file -> String.chop_suffix file ~suffix:".md")
     in
-    List.iter source_files ~f:generate_pragma;
+    let post_generation_rules =
+      List.map
+        source_files
+        ~f:(post_generation_rule ~build_script_path ~templates_dir ~git_revision_file)
+      |> String.concat ~sep:"\n"
+    in
     let output_files = List.map source_files ~f:(fun file -> [%string "%{file}.html"]) in
     print_endline
       [%string
-        {|
+        {|; post generation rules
+%{post_generation_rules}
+
+; aggregation alias
 (alias
   (name default)
   (deps %{String.concat ~sep:" " output_files}))

@@ -6,7 +6,16 @@
  (action
   (with-stdout-to
    dune.inc.gen
-   (run ../../tools/bin/tools.exe print-dune-rules ../../src))))
+   (run
+    ../../tools/bin/tools.exe
+    print-dune-rules
+    ../../src
+    -build-script
+    ../../scripts/build.sh
+    -templates-dir
+    ../../templates
+    -git-revision-file
+    ../git-revision))))
 
 (rule
  (alias default)
