@@ -1,6 +1,6 @@
 ; post generation rules
 (rule
- (deps ../../tools/bin/tools.exe ../../templates/post.html ../../src/2020-06-29-optin-state.md ../git-revision)
+ (deps ../../tools/bin/tools.exe (glob_files ../../templates/post.html/*.html) ../../src/2020-06-29-optin-state.md ../git-revision)
  (targets 2020-06-29-optin-state.html)
  (action
   (run
@@ -12,7 +12,7 @@
     -template ../../templates/post.html
     )))
 (rule
- (deps ../../tools/bin/tools.exe ../../templates/post.html ../../src/2020-07-25-ldap-client-with-nixos.md ../git-revision)
+ (deps ../../tools/bin/tools.exe (glob_files ../../templates/post.html/*.html) ../../src/2020-07-25-ldap-client-with-nixos.md ../git-revision)
  (targets 2020-07-25-ldap-client-with-nixos.html)
  (action
   (run
@@ -24,7 +24,7 @@
     -template ../../templates/post.html
     )))
 (rule
- (deps ../../tools/bin/tools.exe ../../templates/post.html ../../src/2020-08-07-jepsen-nixos-containers.md ../git-revision)
+ (deps ../../tools/bin/tools.exe (glob_files ../../templates/post.html/*.html) ../../src/2020-08-07-jepsen-nixos-containers.md ../git-revision)
  (targets 2020-08-07-jepsen-nixos-containers.html)
  (action
   (run
@@ -36,7 +36,7 @@
     -template ../../templates/post.html
     )))
 (rule
- (deps ../../tools/bin/tools.exe ../../templates/post.html ../../src/2021-06-19-bootstrapping-nix-channels-in-nixos.md ../git-revision)
+ (deps ../../tools/bin/tools.exe (glob_files ../../templates/post.html/*.html) ../../src/2021-06-19-bootstrapping-nix-channels-in-nixos.md ../git-revision)
  (targets 2021-06-19-bootstrapping-nix-channels-in-nixos.html)
  (action
   (run
@@ -48,7 +48,7 @@
     -template ../../templates/post.html
     )))
 (rule
- (deps ../../tools/bin/tools.exe ../../templates/post.html ../../src/2024-11-09-static-site-generation-in-dune.md ../git-revision)
+ (deps ../../tools/bin/tools.exe (glob_files ../../templates/post.html/*.html) ../../src/2024-11-09-static-site-generation-in-dune.md ../git-revision)
  (targets 2024-11-09-static-site-generation-in-dune.html)
  (action
   (run

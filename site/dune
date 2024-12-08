@@ -7,14 +7,21 @@
 
 (rule
  (deps
-  ../scripts/index.sh
+  ../tools/bin/tools.exe
   (source_tree ../src)
   (glob_files ../templates/*.html)
   git-revision)
  (action
   (with-stdout-to
    index.html
-   (run ../scripts/index.sh "%{read-lines:git-revision}"))))
+   (run
+    ../tools/bin/tools.exe
+    build-index
+    ../src
+    -git-revision
+    "%{read-lines:git-revision}"
+    -template
+    ../templates/index.html))))
 
 (rule
  (deps ../site_config.json git-revision)

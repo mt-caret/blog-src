@@ -39,7 +39,7 @@ let generate_posts_for_syndication
   let open Shexp_process.Let_syntax in
   let%bind posts =
     readdir input_dir
-    >>| List'.sort ~compare:String.compare
+    >>| List'.sort ~compare:Filename.compare
     >>| List'.filter_map ~f:(fun file ->
       String.chop_suffix ~suffix:".md" file
       |> Option.map ~f:(fun slug ->
@@ -92,17 +92,74 @@ let build_post =
       ; "--template"
       ; template_file
       ; "--variable"
-      ; [%string "rev:'%{git_revision}'"]
+      ; [%string "rev:%{git_revision}"]
       ; "--to=html5"
       ]
     |> eval
 ;;
 
-let post_generation_rule slug ~self_path ~template_file ~git_revision_file =
+module Post_metadata = struct
+  open Ppx_yojson_conv_lib.Yojson_conv
+
+  type t =
+    { date : string
+    ; title : string
+    ; href : string
+    }
+  [@@deriving yojson_of]
+end
+
+let build_index =
+  Command.basic ~summary:"Build index.html"
+  @@
+  let%map_open.Command input_dir = anon ("INPUT_DIR" %: Filename_unix.arg_type)
+  and git_revision = flag "git-revision" (required string) ~doc:"Git revision"
+  and template_file =
+    flag "template" (required Filename_unix.arg_type) ~doc:"Path to template file"
+  in
+  fun () ->
+    let module List' = List in
+    let open Shexp_process in
+    let open Shexp_process.Infix in
+    (let%bind.Shexp_process input_files =
+       readdir input_dir
+       >>| List'.sort ~compare:Filename.compare
+       >>| (* We want the newest posts first *)
+       List'.rev
+     in
+     let%bind.Shexp_process posts =
+       List'.map input_files ~f:(fun file ->
+         let slug = String.chop_suffix_exn ~suffix:".md" file in
+         get_metadata (Filename.concat input_dir file)
+         |> Shexp_process.map ~f:(fun metadata ->
+           { Post_metadata.date = Date.to_string metadata.date
+           ; title = metadata.title
+           ; href = "./posts/" ^ slug ^ ".html"
+           }))
+       |> fork_all
+       >>| Ppx_yojson_conv_lib.Yojson_conv.([%yojson_of: Post_metadata.t list])
+       >>| Yojson.Safe.to_string
+     in
+     echo [%string {|---
+title: blog
+posts: %{posts}
+---|}]
+     |- run
+          "pandoc"
+          [ "--template"
+          ; template_file
+          ; "--variable"
+          ; [%string "rev:%{git_revision}"]
+          ; "--to=html5"
+          ])
+    |> eval
+;;
+
+let post_generation_rule slug ~self_path ~template_dir ~git_revision_file =
   let git_revision_variable = "%{read-lines:" ^ git_revision_file ^ "}" in
   [%string
     {|(rule
- (deps %{self_path} %{template_file} ../../src/%{slug}.md %{git_revision_file})
+ (deps %{self_path} (glob_files %{template_dir}/*.html) ../../src/%{slug}.md %{git_revision_file})
  (targets %{slug}.html)
  (action
   (run
@@ -111,7 +168,7 @@ let post_generation_rule slug ~self_path ~template_file ~git_revision_file =
     ../../src/%{slug}.md
     %{slug}.html
     -git-revision "%{git_revision_variable}"
-    -template %{template_file}
+    -template %{template_dir}
     )))|}]
 ;;
 
@@ -119,7 +176,7 @@ let print_dune_rules =
   Command.basic ~summary:"Print out dune rules"
   @@
   let%map_open.Command input_dir = anon ("INPUT_DIR" %: Filename_unix.arg_type)
-  and template_file =
+  and template_dir =
     flag "template" (required Filename_unix.arg_type) ~doc:"Path to template file"
   and git_revision_file =
     flag
@@ -135,13 +192,13 @@ let print_dune_rules =
     in
     let source_files =
       Sys_unix.ls_dir input_dir
-      |> List.sort ~compare:String.compare
+      |> List.sort ~compare:Filename.compare
       |> List.filter_map ~f:(fun file -> String.chop_suffix file ~suffix:".md")
     in
     let post_generation_rules =
       List.map
         source_files
-        ~f:(post_generation_rule ~self_path ~template_file ~git_revision_file)
+        ~f:(post_generation_rule ~self_path ~template_dir ~git_revision_file)
       |> String.concat ~sep:"\n"
     in
     let output_files = List.map source_files ~f:(fun file -> [%string "%{file}.html"]) in
@@ -163,5 +220,6 @@ let command =
     [ "syndication-feeds", syndication_feeds
     ; "print-dune-rules", print_dune_rules
     ; "build-post", build_post
+    ; "build-index", build_index
     ]
 ;;
