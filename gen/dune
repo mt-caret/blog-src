@@ -1,5 +1,0 @@
-(executable
- (name gen)
- (libraries core core_unix.sys_unix)
- (preprocess
-  (pps ppx_jane)))

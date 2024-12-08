@@ -73,8 +73,41 @@ let syndication_feeds =
     |> eval
 ;;
 
+let generate_pragma slug =
+  let git_revision_variable = "%{read-lines:../git-revision}" in
+  print_endline
+    [%string
+      {|
+(rule
+ (deps ../../scripts/build.sh (glob_files ../../templates/*.html) ../../src/%{slug}.md ../git-revision)
+ (targets %{slug}.html)
+ (action
+  (run ../../scripts/build.sh ../../src/%{slug}.md %{slug}.html "%{git_revision_variable}")))|}]
+;;
+
+let print_dune_rules =
+  Command.basic ~summary:"Print out dune rules"
+  @@
+  let%map_open.Command input_dir = anon ("INPUT_DIR" %: string) in
+  fun () ->
+    let source_files =
+      Sys_unix.ls_dir input_dir
+      |> List.sort ~compare:String.compare
+      |> List.filter_map ~f:(fun file -> String.chop_suffix file ~suffix:".md")
+    in
+    List.iter source_files ~f:generate_pragma;
+    let output_files = List.map source_files ~f:(fun file -> [%string "%{file}.html"]) in
+    print_endline
+      [%string
+        {|
+(alias
+  (name default)
+  (deps %{String.concat ~sep:" " output_files}))
+  |}]
+;;
+
 let command =
   Command.group
     ~summary:"Tools for generating blog"
-    [ "syndication-feeds", syndication_feeds ]
+    [ "syndication-feeds", syndication_feeds; "print-dune-rules", print_dune_rules ]
 ;;
