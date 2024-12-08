@@ -73,27 +73,54 @@ let syndication_feeds =
     |> eval
 ;;
 
-let post_generation_rule slug ~build_script_path ~templates_dir ~git_revision_file =
+let build_post =
+  Command.basic ~summary:"Build a post"
+  @@
+  let%map_open.Command input_file = anon ("INPUT_FILE" %: Filename_unix.arg_type)
+  and output_file = anon ("OUTPUT_FILE" %: Filename_unix.arg_type)
+  and git_revision = flag "git-revision" (required string) ~doc:"Git revision"
+  and template_file =
+    flag "template" (required Filename_unix.arg_type) ~doc:"Path to template file"
+  in
+  fun () ->
+    let open Shexp_process in
+    run
+      "pandoc"
+      [ input_file
+      ; "--output"
+      ; output_file
+      ; "--template"
+      ; template_file
+      ; "--variable"
+      ; [%string "rev:'%{git_revision}'"]
+      ; "--to=html5"
+      ]
+    |> eval
+;;
+
+let post_generation_rule slug ~self_path ~template_file ~git_revision_file =
   let git_revision_variable = "%{read-lines:" ^ git_revision_file ^ "}" in
   [%string
     {|(rule
- (deps %{build_script_path} (glob_files %{templates_dir}/*.html) ../../src/%{slug}.md %{git_revision_file})
+ (deps %{self_path} %{template_file} ../../src/%{slug}.md %{git_revision_file})
  (targets %{slug}.html)
  (action
-  (run %{build_script_path} ../../src/%{slug}.md %{slug}.html "%{git_revision_variable}")))|}]
+  (run
+    %{self_path}
+    build-post
+    ../../src/%{slug}.md
+    %{slug}.html
+    -git-revision "%{git_revision_variable}"
+    -template %{template_file}
+    )))|}]
 ;;
 
 let print_dune_rules =
   Command.basic ~summary:"Print out dune rules"
   @@
   let%map_open.Command input_dir = anon ("INPUT_DIR" %: Filename_unix.arg_type)
-  and build_script_path =
-    flag "build-script" (required Filename_unix.arg_type) ~doc:"Path to build script"
-  and templates_dir =
-    flag
-      "templates-dir"
-      (required Filename_unix.arg_type)
-      ~doc:"Path to templates directory"
+  and template_file =
+    flag "template" (required Filename_unix.arg_type) ~doc:"Path to template file"
   and git_revision_file =
     flag
       "git-revision-file"
@@ -101,6 +128,11 @@ let print_dune_rules =
       ~doc:"Path to git revision file"
   in
   fun () ->
+    let self_path =
+      (* [Command.Param.args] exists, but the directory seems to be stripped
+         there, so we get argv directly. *)
+      (Sys.get_argv ()).(0)
+    in
     let source_files =
       Sys_unix.ls_dir input_dir
       |> List.sort ~compare:String.compare
@@ -109,7 +141,7 @@ let print_dune_rules =
     let post_generation_rules =
       List.map
         source_files
-        ~f:(post_generation_rule ~build_script_path ~templates_dir ~git_revision_file)
+        ~f:(post_generation_rule ~self_path ~template_file ~git_revision_file)
       |> String.concat ~sep:"\n"
     in
     let output_files = List.map source_files ~f:(fun file -> [%string "%{file}.html"]) in
@@ -128,5 +160,8 @@ let print_dune_rules =
 let command =
   Command.group
     ~summary:"Tools for generating blog"
-    [ "syndication-feeds", syndication_feeds; "print-dune-rules", print_dune_rules ]
+    [ "syndication-feeds", syndication_feeds
+    ; "print-dune-rules", print_dune_rules
+    ; "build-post", build_post
+    ]
 ;;

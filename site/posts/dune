@@ -10,10 +10,8 @@
     ../../tools/bin/tools.exe
     print-dune-rules
     ../../src
-    -build-script
-    ../../scripts/build.sh
-    -templates-dir
-    ../../templates
+    -template
+    ../../templates/post.html
     -git-revision-file
     ../git-revision))))
 
