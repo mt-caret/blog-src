@@ -29,10 +29,13 @@ let generate_posts_for_syndication
 let syndication_feeds =
   Command.basic ~summary:"Generate syndication feeds"
   @@
-  let%map_open.Command input_dir = anon ("INPUT_DIR" %: Filename_unix.arg_type)
-  and output_dir = anon ("OUTPUT_DIR" %: Filename_unix.arg_type)
+  let%map_open.Command input_dir = Param.input_dir
+  and output_dir = Param.output_dir
   and site_config =
-    flag "site-config" (required Filename_unix.arg_type) ~doc:"Path to site config file"
+    flag
+      "site-config"
+      (required Filename_unix.arg_type)
+      ~doc:"PATH Path to site config file"
   in
   fun () ->
     let open Shexp_process in
@@ -45,12 +48,10 @@ let syndication_feeds =
 let build_post =
   Command.basic ~summary:"Build a post"
   @@
-  let%map_open.Command input_file = anon ("INPUT_FILE" %: Filename_unix.arg_type)
-  and output_file = anon ("OUTPUT_FILE" %: Filename_unix.arg_type)
-  and git_revision = flag "git-revision" (required string) ~doc:"Git revision"
-  and template_file =
-    flag "template" (required Filename_unix.arg_type) ~doc:"Path to template file"
-  in
+  let%map_open.Command input_file = Param.input_file
+  and output_file = Param.output_file
+  and git_revision = Param.git_revision
+  and template_file = Param.template_file in
   fun () ->
     let open Shexp_process in
     eval
@@ -89,11 +90,9 @@ end
 let build_index =
   Command.basic ~summary:"Build index.html"
   @@
-  let%map_open.Command input_dir = anon ("INPUT_DIR" %: Filename_unix.arg_type)
-  and git_revision = flag "git-revision" (required string) ~doc:"Git revision"
-  and template_file =
-    flag "template" (required Filename_unix.arg_type) ~doc:"Path to template file"
-  in
+  let%map_open.Command input_dir = Param.input_dir
+  and git_revision = Param.git_revision
+  and template_file = Param.template_file in
   fun () ->
     let module List' = List in
     let open Shexp_process in
@@ -143,15 +142,9 @@ let post_generation_rule slug ~self_path ~template_file ~git_revision_file =
 let print_dune_rules =
   Command.basic ~summary:"Print out dune rules"
   @@
-  let%map_open.Command input_dir = anon ("INPUT_DIR" %: Filename_unix.arg_type)
-  and template_file =
-    flag "template" (required Filename_unix.arg_type) ~doc:"Path to template file"
-  and git_revision_file =
-    flag
-      "git-revision-file"
-      (required Filename_unix.arg_type)
-      ~doc:"Path to git revision file"
-  in
+  let%map_open.Command input_dir = Param.input_dir
+  and template_file = Param.template_file
+  and git_revision_file = Param.git_revision_file in
   fun () ->
     let module List' = List in
     let open Shexp_process in
