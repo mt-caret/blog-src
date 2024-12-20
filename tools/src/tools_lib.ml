@@ -153,24 +153,27 @@ let print_dune_rules =
       ~doc:"Path to git revision file"
   in
   fun () ->
+    let module List' = List in
+    let open Shexp_process in
+    let open Shexp_process.Let_syntax in
+    eval
+    @@
     let self_path =
       (* [Command.Param.args] exists, but the directory seems to be stripped
          there, so we get argv directly. *)
       (Sys.get_argv ()).(0)
     in
-    let source_files =
-      Sys_unix.ls_dir input_dir
-      |> List.sort ~compare:Filename.compare
-      |> List.filter_map ~f:(fun file -> String.chop_suffix file ~suffix:".md")
+    let%bind slugs =
+      Path_and_slug.readdir ~input_dir >>| List'.map ~f:Path_and_slug.slug
     in
     let post_generation_rules =
-      List.map
-        source_files
+      List'.map
+        slugs
         ~f:(post_generation_rule ~self_path ~template_file ~git_revision_file)
       |> String.concat ~sep:"\n"
     in
-    let output_files = List.map source_files ~f:(fun file -> [%string "%{file}.html"]) in
-    print_endline
+    let output_files = List'.map slugs ~f:(fun file -> [%string "%{file}.html"]) in
+    echo
       [%string
         {|; post generation rules
 %{post_generation_rules}
