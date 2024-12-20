@@ -156,8 +156,9 @@ posts: %{posts}
     |> eval
 ;;
 
-let post_generation_rule slug ~self_path ~template_dir ~git_revision_file =
+let post_generation_rule slug ~self_path ~template_file ~git_revision_file =
   let git_revision_variable = "%{read-lines:" ^ git_revision_file ^ "}" in
+  let template_dir = Filename.dirname template_file in
   [%string
     {|(rule
  (deps %{self_path} (glob_files %{template_dir}/*.html) ../../src/%{slug}.md %{git_revision_file})
@@ -169,7 +170,7 @@ let post_generation_rule slug ~self_path ~template_dir ~git_revision_file =
     ../../src/%{slug}.md
     %{slug}.html
     -git-revision "%{git_revision_variable}"
-    -template %{template_dir}
+    -template %{template_file}
     )))|}]
 ;;
 
@@ -177,7 +178,7 @@ let print_dune_rules =
   Command.basic ~summary:"Print out dune rules"
   @@
   let%map_open.Command input_dir = anon ("INPUT_DIR" %: Filename_unix.arg_type)
-  and template_dir =
+  and template_file =
     flag "template" (required Filename_unix.arg_type) ~doc:"Path to template file"
   and git_revision_file =
     flag
@@ -199,7 +200,7 @@ let print_dune_rules =
     let post_generation_rules =
       List.map
         source_files
-        ~f:(post_generation_rule ~self_path ~template_dir ~git_revision_file)
+        ~f:(post_generation_rule ~self_path ~template_file ~git_revision_file)
       |> String.concat ~sep:"\n"
     in
     let output_files = List.map source_files ~f:(fun file -> [%string "%{file}.html"]) in
