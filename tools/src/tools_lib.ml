@@ -1,26 +1,6 @@
 open! Core
+open! Import
 module Syndication = Syndication
-
-let write_endline string ~filename =
-  let open Shexp_process in
-  echo ~where:Stdout ~n:() string |> outputs_to filename
-;;
-
-let evaluate_template input_file ~template =
-  let open Shexp_process in
-  let open Shexp_process.Let_syntax in
-  with_temp_file ~prefix:"" ~suffix:".template" (fun template_file ->
-    let%bind () = write_endline template ~filename:template_file in
-    run "pandoc" [ input_file; "--template"; template_file ])
-  |- read_all
-;;
-
-let get_metadata input_file =
-  evaluate_template input_file ~template:"$meta-json$"
-  |> Shexp_process.map ~f:Metadata.parse
-;;
-
-let get_body input_file = evaluate_template input_file ~template:"$body$"
 
 let load_site_config site_config_path =
   let open Shexp_process in
@@ -34,20 +14,9 @@ let generate_posts_for_syndication
   ~output_dir
   ({ base_url; _ } as site_config : Syndication.Site_config.t)
   =
-  let module List' = List in
-  let open Shexp_process in
   let open Shexp_process.Let_syntax in
   let%bind posts =
-    readdir input_dir
-    >>| List'.sort ~compare:Filename.compare
-    >>| List'.filter_map ~f:(fun file ->
-      String.chop_suffix ~suffix:".md" file
-      |> Option.map ~f:(fun slug ->
-        let path = Filename.concat input_dir file in
-        let%map metadata = get_metadata path
-        and content_html = get_body path in
-        Syndication.Post.create metadata ~slug ~base_url ~content_html))
-    >>= fork_all
+    Post.load_all ~input_dir >>| List.map ~f:(Syndication.Post.create ~base_url)
   in
   let%bind () =
     Syndication.create_rss_feed site_config posts
@@ -84,18 +53,18 @@ let build_post =
   in
   fun () ->
     let open Shexp_process in
-    run
-      "pandoc"
-      [ input_file
-      ; "--output"
-      ; output_file
-      ; "--template"
-      ; template_file
-      ; "--variable"
-      ; [%string "rev:%{git_revision}"]
-      ; "--to=html5"
-      ]
-    |> eval
+    eval
+    @@ run
+         "pandoc"
+         [ input_file
+         ; "--output"
+         ; output_file
+         ; "--template"
+         ; template_file
+         ; "--variable"
+         ; [%string "rev:%{git_revision}"]
+         ; "--to=html5"
+         ]
 ;;
 
 (* TODO: It's confusing that there's Metadata.t and Post_metadata.t; fix this. *)
@@ -108,6 +77,13 @@ module Post_metadata = struct
     ; href : string
     }
   [@@deriving yojson_of]
+
+  let of_metadata (metadata : Metadata.t) ~dir =
+    { date = metadata.date
+    ; title = metadata.title
+    ; href = Filename.concat dir (metadata.slug ^ ".html")
+    }
+  ;;
 end
 
 let build_index =
@@ -122,38 +98,28 @@ let build_index =
     let module List' = List in
     let open Shexp_process in
     let open Shexp_process.Infix in
-    (let%bind.Shexp_process input_files =
-       readdir input_dir
-       >>| List'.sort ~compare:Filename.compare
-       >>| (* We want the newest posts first *)
-       List'.rev
-     in
-     let%bind.Shexp_process posts =
-       List'.map input_files ~f:(fun file ->
-         let slug = String.chop_suffix_exn ~suffix:".md" file in
-         get_metadata (Filename.concat input_dir file)
-         |> Shexp_process.map ~f:(fun metadata ->
-           { Post_metadata.date = metadata.date
-           ; title = metadata.title
-           ; href = "./posts/" ^ slug ^ ".html"
-           }))
-       |> fork_all
-       >>| Ppx_yojson_conv_lib.Yojson_conv.([%yojson_of: Post_metadata.t list])
-       >>| Yojson.Safe.to_string
-     in
-     echo [%string {|---
+    eval
+    @@
+    let%bind.Shexp_process posts =
+      Metadata.load_all ~input_dir
+      >>| (* We want the newest posts first *)
+      List'.rev
+      >>| List'.map ~f:(Post_metadata.of_metadata ~dir:"./posts/")
+      >>| Ppx_yojson_conv_lib.Yojson_conv.([%yojson_of: Post_metadata.t list])
+      >>| Yojson.Safe.to_string
+    in
+    echo [%string {|---
 title: blog
 posts: %{posts}
 ---|}]
-     |- run
-          "pandoc"
-          [ "--template"
-          ; template_file
-          ; "--variable"
-          ; [%string "rev:%{git_revision}"]
-          ; "--to=html5"
-          ])
-    |> eval
+    |- run
+         "pandoc"
+         [ "--template"
+         ; template_file
+         ; "--variable"
+         ; [%string "rev:%{git_revision}"]
+         ; "--to=html5"
+         ]
 ;;
 
 let post_generation_rule slug ~self_path ~template_file ~git_revision_file =

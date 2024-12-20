@@ -22,7 +22,7 @@ module Post : sig
     ; uuid : string
     }
 
-  val create : Metadata.t -> slug:string -> base_url:string -> content_html:string -> t
+  val create : Post.t -> base_url:string -> t
 end
 
 val create_rss_feed : Site_config.t -> Post.t list -> string

@@ -4,6 +4,7 @@
   core
   core_unix.command_unix
   core_unix.filename_unix
+  core_kernel.composition_infix
   ppx_yojson_conv_lib
   shexp.process
   yocaml_syndication

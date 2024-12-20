@@ -45,10 +45,11 @@ module Post = struct
   [@@deriving fields ~getters]
 
   let create
-    ({ date; update_date; title; category = _; tags = _; uuid } : Metadata.t)
-    ~slug
+    ({ metadata = { date; update_date; title; category = _; tags = _; uuid; slug }
+     ; content_html
+     } :
+      Post.t)
     ~base_url
-    ~content_html
     =
     { title
     ; creation_date = date
