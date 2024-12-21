@@ -7,4 +7,4 @@ TODOs:
 - [x] move gen/gen.exe into tools
 - [x] add link to atom/rss feeds
 - [ ] add multilingual support
-- [ ] fix tags and categories
+- [x] fix tags and categories
