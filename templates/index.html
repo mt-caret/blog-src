@@ -16,8 +16,8 @@
   <meta name="keywords" content="$for(keywords)$$keywords$$sep$, $endfor$" />
   $endif$
   <title>$if(title-prefix)$$title-prefix$ – $endif$$pagetitle$</title>
-  <link rel="stylesheet" href="./static/reset.css" />
-  <link rel="stylesheet" href="./static/custom.css" />
+  <link rel="stylesheet" href="$root_dir$/static/reset.css" />
+  <link rel="stylesheet" href="$root_dir$/static/custom.css" />
   $for(css)$
   <link rel="stylesheet" href="$css$" />
   $endfor$
@@ -64,7 +64,10 @@
     $endfor$
     <hr>
     <small>
-      <a href="./atom.xml">atom</a>/<a href="./rss.xml">rss</a> |
+      $if(show_index_link)$
+      <a href="$root_dir$/index.html">index</a> |
+      $endif$
+      <a href="$root_dir$/atom.xml">atom</a>/<a href="$root_dir$/rss.xml">rss</a> |
       generated off rev <a href="https://github.com/mt-caret/blog-src/commit/$rev$">$rev$</a>
     </small>
   </article>

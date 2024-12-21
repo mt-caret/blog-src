@@ -9,6 +9,12 @@
     build-index -git-revision STRING
                                . Git revision
     build-index -template PATH . Path to template file
+    build-index [-category Generate]
+                               . index for category
+    build-index [-root-dir DIR]
+                               . root dir relative to output dir
+    build-index [-tag Generate]
+                               . index for tag
     build-post                 . Build a post
     build-post -git-revision STRING
                                . Git revision
@@ -18,6 +24,8 @@
                                . Path to git revision file
     print-dune-rules -template PATH
                                . Path to template file
+    print-dune-rules [-kind Kind]
+                               . of rule to print (can be: category, index, tag)
     syndication-feeds          . Generate syndication feeds
     syndication-feeds -site-config PATH
                                . Path to site config file

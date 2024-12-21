@@ -1,0 +1,25 @@
+(include dune.inc)
+
+(rule
+ (deps
+  (source_tree ../../src))
+ (action
+  (with-stdout-to
+   dune.inc.gen
+   (run
+    ../../tools/bin/tools.exe
+    print-dune-rules
+    ../../src
+    -template
+    ../../templates/index.html
+    -git-revision-file
+    ../git-revision
+    -kind
+    category))))
+
+(rule
+ (alias default)
+ (deps
+  (source_tree ../static))
+ (action
+  (diff dune.inc dune.inc.gen)))
