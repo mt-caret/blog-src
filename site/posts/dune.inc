@@ -60,14 +60,14 @@
     -template ../../templates/post.html
     )))
 (rule
- (deps ../../tools/bin/tools.exe (glob_files ../../templates/*.html) ../../src/2025-02-02-calling-ocaml-from-c.md ../git-revision)
- (targets 2025-02-02-calling-ocaml-from-c.html)
+ (deps ../../tools/bin/tools.exe (glob_files ../../templates/*.html) ../../src/2025-02-02-calling-ocaml-from-c-in-dune.md ../git-revision)
+ (targets 2025-02-02-calling-ocaml-from-c-in-dune.html)
  (action
   (run
     ../../tools/bin/tools.exe
     build-post
-    ../../src/2025-02-02-calling-ocaml-from-c.md
-    2025-02-02-calling-ocaml-from-c.html
+    ../../src/2025-02-02-calling-ocaml-from-c-in-dune.md
+    2025-02-02-calling-ocaml-from-c-in-dune.html
     -git-revision "%{read-lines:../git-revision}"
     -template ../../templates/post.html
     )))
@@ -75,5 +75,5 @@
 ; aggregation alias
 (alias
   (name default)
-  (deps 2020-06-29-optin-state.html 2020-07-25-ldap-client-with-nixos.html 2020-08-07-jepsen-nixos-containers.html 2021-06-19-bootstrapping-nix-channels-in-nixos.html 2024-11-09-static-site-generation-in-dune.html 2025-02-02-calling-ocaml-from-c.html))
+  (deps 2020-06-29-optin-state.html 2020-07-25-ldap-client-with-nixos.html 2020-08-07-jepsen-nixos-containers.html 2021-06-19-bootstrapping-nix-channels-in-nixos.html 2024-11-09-static-site-generation-in-dune.html 2025-02-02-calling-ocaml-from-c-in-dune.html))
   
