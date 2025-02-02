@@ -11,8 +11,6 @@ uuid: 6bf20f9a-1635-4cf0-98f2-80361e16eb61
 These are some notes on putting together a `dune` file for creating a C
 executable which calls OCaml code.
 
-<!-- TODO: Add link to repository -->
-
 The OCaml manual describes how to call OCaml code from C under the section
 "Advanced example with callbacks" in the chapter "Interfacing C with OCaml",
 using the following invocations to `ocamlopt`:
@@ -87,3 +85,7 @@ And voila!
 $ dune exec ./main.exe
 fib(10) = Result is: 89            
 ```
+
+The full code is available in the 
+[calling-ocaml-from-c](https://github.com/mt-caret/calling-ocaml-from-c)
+repository.
