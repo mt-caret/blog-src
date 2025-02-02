@@ -1,6 +1,9 @@
 ---
 title: Static site generation in dune
 date: 2024-11-09
+category: tech
+tag:
+- dune
 uuid: 1b57d296-19d1-4552-a823-f7b3b32f766d
 ---
 
