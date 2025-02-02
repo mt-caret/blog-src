@@ -1,7 +1,7 @@
 blog source
 
 commands:
-- build+watch: `dune build -w @runtest @default gen/gen.exe --auto-promote`
+- build+watch: `dune build -w @runtest @default --auto-promote`
 
 TODOs:
 - [x] move gen/gen.exe into tools
