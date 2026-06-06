@@ -1,0 +1,15 @@
+(version v0.17.0)
+
+(build
+ (all_platforms ((action (run dune build -p %{pkg-self:name} -j %{jobs})))))
+
+(depends
+ (all_platforms
+  (ocaml base ppx_optcomp ppx_sexp_conv dune)))
+
+(source
+ (fetch
+  (url
+   https://github.com/janestreet/posixat/archive/refs/tags/v0.17.0.tar.gz)
+  (checksum
+   sha256=6f45df31dccb16b014243b1c155d5dbc59de3184562f4869cd9f6e3d05be03cc)))

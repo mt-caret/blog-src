@@ -263,8 +263,8 @@ let print_dune_rules =
     eval
     @@
     let self_path =
-      (* [Command.Param.args] exists, but the directory seems to be stripped
-         there, so we get argv directly. *)
+      (* [Command.Param.args] exists, but the directory seems to be stripped there, so we
+         get argv directly. *)
       (Sys.get_argv ()).(0)
     in
     match kind with
