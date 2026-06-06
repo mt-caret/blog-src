@@ -45,11 +45,11 @@ module Post = struct
   [@@deriving fields ~getters]
 
   let create
-    ({ metadata = { date; update_date; title; category = _; tags = _; uuid; slug }
-     ; content_html
-     } :
-      Post.t)
-    ~base_url
+        ({ metadata = { date; update_date; title; category = _; tags = _; uuid; slug }
+         ; content_html
+         } :
+          Post.t)
+        ~base_url
     =
     { title
     ; creation_date = date
@@ -70,8 +70,8 @@ module Post = struct
   ;;
 
   let to_atom_entry
-    { title; creation_date; update_date; url; content_html; uuid }
-    ~domain_name
+        { title; creation_date; update_date; url; content_html; uuid }
+        ~domain_name
     =
     (* We use a tag URI for the id, as recommended by
        http://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id *)
@@ -88,15 +88,15 @@ module Post = struct
 end
 
 let create_rss_feed
-  ({ title
-   ; base_url
-   ; domain_name = _
-   ; description
-   ; author = _
-   ; site_generator_version = _
-   } as config :
-    Site_config.t)
-  posts
+      ({ title
+       ; base_url
+       ; domain_name = _
+       ; description
+       ; author = _
+       ; site_generator_version = _
+       } as config :
+        Site_config.t)
+      posts
   =
   Rss.feed
     ~generator:(Site_config.generator config)
@@ -110,10 +110,15 @@ let create_rss_feed
 ;;
 
 let create_atom_feed
-  ({ title; base_url; domain_name; description = _; author; site_generator_version = _ }
-   as config :
-    Site_config.t)
-  posts
+      ({ title
+       ; base_url
+       ; domain_name
+       ; description = _
+       ; author
+       ; site_generator_version = _
+       } as config :
+        Site_config.t)
+      posts
   =
   let most_recent_update_date =
     List.map posts ~f:Post.update_date

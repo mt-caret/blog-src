@@ -10,9 +10,9 @@ let load_site_config site_config_path =
 ;;
 
 let generate_posts_for_syndication
-  ~input_dir
-  ~output_dir
-  ({ base_url; _ } as site_config : Syndication.Site_config.t)
+      ~input_dir
+      ~output_dir
+      ({ base_url; _ } as site_config : Syndication.Site_config.t)
   =
   let open Shexp_process.Let_syntax in
   let%bind posts =
@@ -185,7 +185,8 @@ let build_index =
     @@
     let%bind.Shexp_process post_metadata =
       Metadata.load_all ~input_dir
-      >>| (* We want the newest posts first *)
+      >>|
+      (* We want the newest posts first *)
       List'.rev
       >>| List'.filter ~f:(Build_index_for.filter build_index_for)
     in
