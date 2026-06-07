@@ -6,5 +6,5 @@ commands:
 TODOs:
 - [x] move gen/gen.exe into tools
 - [x] add link to atom/rss feeds
-- [ ] add multilingual support
+- [x] add multilingual support
 - [x] fix tags and categories

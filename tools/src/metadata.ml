@@ -35,12 +35,15 @@ type t =
   ; tags : string list
   ; uuid : string
   ; slug : string
+  ; lang : Lang.t
+  ; translation_base : string
   }
 [@@deriving sexp_of, fields ~getters]
 
 let create ({ date; update_date; title; category; tags; uuid } : From_frontmatter.t) ~slug
   =
-  { date; update_date; title; category; tags; uuid; slug }
+  let lang, translation_base = Lang.of_slug slug in
+  { date; update_date; title; category; tags; uuid; slug; lang; translation_base }
 ;;
 
 let load filename ~slug =

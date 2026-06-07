@@ -45,6 +45,33 @@ let syndication_feeds =
     |> eval
 ;;
 
+module Pandoc_metadata = struct
+  open Ppx_yojson_conv_lib.Yojson_conv
+
+  module Translation = struct
+    type t =
+      { code : string
+      ; label : string
+      ; href : string
+      }
+    [@@deriving yojson_of]
+
+    let of_metadata metadata =
+      let lang = Metadata.lang metadata in
+      { code = Lang.code lang
+      ; label = Lang.label lang
+      ; href = Metadata.slug metadata ^ ".html"
+      }
+    ;;
+  end
+
+  type t = { translations : Translation.t list } [@@deriving yojson_of]
+
+  let of_siblings siblings =
+    { translations = List.map siblings ~f:Translation.of_metadata }
+  ;;
+end
+
 let build_post =
   Command.basic ~summary:"Build a post"
   @@
@@ -53,19 +80,47 @@ let build_post =
   and git_revision = Param.git_revision
   and template_file = Param.template_file in
   fun () ->
+    let module List' = List in
     let open Shexp_process in
+    let open Shexp_process.Let_syntax in
+    let input_dir = Filename.dirname input_file in
+    let slug = Filename.basename input_file |> String.chop_suffix_exn ~suffix:".md" in
+    let lang, translation_base = Lang.of_slug slug in
     eval
-    @@ run
-         "pandoc"
-         [ input_file
-         ; "--output"
-         ; output_file
-         ; "--template"
-         ; template_file
-         ; "--variable"
-         ; [%string "rev:%{git_revision}"]
-         ; "--to=html5"
-         ]
+    @@
+    let%bind siblings =
+      let open Shexp_process.Infix in
+      Path_and_slug.readdir ~input_dir
+      >>| List'.filter ~f:(fun ({ path = _; slug = other_slug } : Path_and_slug.t) ->
+        let other_lang, other_translation_base = Lang.of_slug other_slug in
+        String.equal other_translation_base translation_base
+        && not ([%equal: Lang.t] other_lang lang))
+      >>| List'.map ~f:(fun ({ path; slug } : Path_and_slug.t) ->
+        Metadata.load path ~slug)
+      >>= fork_all
+    in
+    let metadata_json =
+      Pandoc_metadata.of_siblings siblings
+      |> [%yojson_of: Pandoc_metadata.t]
+      |> Yojson.Safe.to_string
+    in
+    with_temp_file ~prefix:"" ~suffix:".json" (fun metadata_file ->
+      let%bind () = write_endline metadata_json ~filename:metadata_file in
+      run
+        "pandoc"
+        [ input_file
+        ; "--output"
+        ; output_file
+        ; "--template"
+        ; template_file
+        ; "--metadata-file"
+        ; metadata_file
+        ; "--variable"
+        ; [%string "post_lang:%{Lang.code lang}"]
+        ; "--variable"
+        ; [%string "rev:%{git_revision}"]
+        ; "--to=html5"
+        ])
 ;;
 
 (* TODO: It's confusing that there's Metadata.t and Post_metadata.t; fix this. *)
@@ -218,9 +273,10 @@ show_index_link: %{not (String.equal root_dir ".")#Bool}
 let post_generation_rule slug ~self_path ~template_file ~git_revision_file =
   let git_revision_variable = "%{read-lines:" ^ git_revision_file ^ "}" in
   let template_dir = Filename.dirname template_file in
+  let _lang, translation_base = Lang.of_slug slug in
   [%string
     {|(rule
- (deps %{self_path} (glob_files %{template_dir}/*.html) ../../src/%{slug}.md %{git_revision_file})
+ (deps %{self_path} (glob_files %{template_dir}/*.html) (glob_files ../../src/%{translation_base}*.md) %{git_revision_file})
  (targets %{slug}.html)
  (action
   (run

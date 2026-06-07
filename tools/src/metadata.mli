@@ -22,6 +22,8 @@ type t =
   ; tags : string list
   ; uuid : string
   ; slug : string
+  ; lang : Lang.t
+  ; translation_base : string
   }
 [@@deriving sexp_of, fields ~getters]
 

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- taken from https://github.com/jgm/pandoc-templates/blob/05d510b4dc5af87cbf25d92fa8318f44e155b919/default.html5 -->
-<html xmlns="http://www.w3.org/1999/xhtml" lang="$lang$" xml:lang="$lang$" $if(dir)$ dir="$dir$" $endif$>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="$post_lang$" xml:lang="$post_lang$" $if(dir)$ dir="$dir$" $endif$>
 
 <head>
   <meta charset="utf-8" />
@@ -19,6 +19,9 @@
   <link rel="stylesheet" href="../static/reset.css" />
   <link rel="stylesheet" href="../static/custom.css" />
   <link rel="stylesheet" href="../static/highlighting.css" />
+  $for(translations)$
+  <link rel="alternate" hreflang="$translations.code$" href="$translations.href$" />
+  $endfor$
   $for(css)$
   <link rel="stylesheet" href="$css$" />
   $endfor$
@@ -61,6 +64,11 @@
       $if(tags)$
       <p class="tags">
         tags: $for(tags)$<a href="../tag/$tags$.html">$tags$</a> $endfor$
+      </p>
+      $endif$
+      $if(translations)$
+      <p class="translations">
+        also available in: $for(translations)$<a href="$translations.href$" hreflang="$translations.code$">$translations.label$</a>$sep$, $endfor$
       </p>
       $endif$
     </header>

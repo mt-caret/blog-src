@@ -45,7 +45,17 @@ module Post = struct
   [@@deriving fields ~getters]
 
   let create
-        ({ metadata = { date; update_date; title; category = _; tags = _; uuid; slug }
+        ({ metadata =
+             { date
+             ; update_date
+             ; title
+             ; category = _
+             ; tags = _
+             ; uuid
+             ; slug
+             ; lang = _
+             ; translation_base = _
+             }
          ; content_html
          } :
           Post.t)
